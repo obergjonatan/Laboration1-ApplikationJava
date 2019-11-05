@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
 public class Controller {
 	private TestChecker testChecker;
@@ -8,58 +9,65 @@ public class Controller {
 	
 	public Controller(ViewFrame viewFrame) {
 		this.viewFrame=viewFrame;
-		viewFrame.setLitseners(this);
 	}
 	
 	public void CloseThreads() {
 		// Close thread that is doing testMethods.
 	}
 	
-	public void RunTests(String className) {
-		this.InitTestChecker(className);
-		
-		Iterable<String> returnStrings=null;
-		try {
-			// TODO Make tests run on a separate thread
-			returnStrings=testChecker.runTestMethods(testChecker.getTestMethods());
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-		
-		for(String s:returnStrings) {
-			// Should be run from EDT?
-			viewFrame.addToOutputTextField(s);
+	public boolean RunTests(String className) {
+		if(this.InitTestChecker(className)) {
 			
+			TestResult testResults=null;
+			Collection<String> returnStrings=null;
+			try {
+				// TODO Make tests run on a separate thread
+				testResults=testChecker.runTestMethods(testChecker.getTestMethods());
+				returnStrings=testResults.getCollection();
+				
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			viewFrame.clearOutputTextField();
+			for(String s:returnStrings) {
+				// Should be run from EDT?
+				viewFrame.addToOutputTextField(s);
+			}
+			viewFrame.setSuccessAndFails(testResults.getSuccesses(), testResults.getFails());
+			
+			return true;
 		}
+		return false;
 		
 	}
 	
-	private void InitTestChecker(String className) {
+	private boolean InitTestChecker(String className) {
 			try {
 				testChecker = new TestChecker(className);
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				viewFrame.popupError("Class name not Found");
+				return false;
 			} catch (ClassNotTestClassException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				viewFrame.popupError("Class is not a TestClass");
+				return false;
 			}
+			return true;
 	}
 
 	public void RunTestButtonPressed(ActionEvent e) {
@@ -67,9 +75,10 @@ public class Controller {
 		if(className == null || className.trim().equals("")) {
 			// TODO Make error appear in View
 		}else {
-			this.RunTests(className);
-			// Should be called from EDT?
-			viewFrame.switchUpperPanels();
+			if(this.RunTests(className)) {
+				// Should be called from EDT?
+				viewFrame.switchUpperPanels();
+			}
 		}
 		
 	}

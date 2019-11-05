@@ -10,6 +10,8 @@ public class MainFrame {
 			public void run() {
 				 ViewFrame gui = new ViewFrame("Namn");
 				 gui.show();
+				 Controller controller = new Controller(gui);
+				 gui.setLitseners(controller);
 			}
 		});
 

@@ -9,6 +9,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
@@ -74,10 +76,12 @@ public class ViewFrame {
 		middlePanel.setLayout(new BorderLayout());
 		testOutputTextArea = new JTextArea("Output Text Area");
 		testOutputTextArea.setBorder(BorderFactory.createTitledBorder("Test Output"));
+		testOutputTextArea.setEditable(false);
 		testSuccessOrFailTextArea = new JTextArea("Total Number of Tests : \n"
 				+ "Number of Fails: \n"
-				+ "Number of Successes: \n",5,5);
+				+ "Number of Successes: \n");
 		testSuccessOrFailTextArea.setBorder(BorderFactory.createTitledBorder("Test Summary"));
+		testSuccessOrFailTextArea.setEditable(false);
 		middlePanel.add(testOutputTextArea,BorderLayout.CENTER);
 		middlePanel.add(testSuccessOrFailTextArea,BorderLayout.SOUTH);
 		middlePanel.setVisible(true);
@@ -106,7 +110,7 @@ public class ViewFrame {
 		
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BorderLayout());
-		inputTextField = new JTextField("Testnamn");
+		inputTextField = new JTextField("Test1");
 		
 		leftPanel.add(inputTextField);
 		
@@ -114,7 +118,7 @@ public class ViewFrame {
 		
 		JPanel rightPanel = new JPanel();
 		rightPanel.setLayout(new FlowLayout());
-		JButton runTestsButton = new JButton("Run Tests");
+		runTestsButton = new JButton("Run Tests");
 		rightPanel.add(runTestsButton);
 		
 		
@@ -141,8 +145,12 @@ public class ViewFrame {
 	}
 
 	public void addToOutputTextField(String s) {
-		testOutputTextArea.append(s);
-		
+		testOutputTextArea.append(s);	
+	}
+	
+	public void setSuccessAndFails(int successes,int fails) {
+		testSuccessOrFailTextArea.setText(" Number of tests passed: " +successes +"\n"+
+											"Number of tests failed: "+fails +"\n");
 	}
 	
 	public void setLitseners(Controller controller) {
@@ -155,8 +163,17 @@ public class ViewFrame {
 	}
 
 	public void switchUpperPanels() {
-		System.out.println("TEST");
 		cards.next(upperPanel);
 		
 	}
+	
+	public void popupError(String errorMessage) {
+		JOptionPane.showMessageDialog(mainFrame,errorMessage,"Error",JOptionPane.ERROR_MESSAGE);
+	}
+
+	public void clearOutputTextField() {
+		testOutputTextArea.setText(null);
+	}
+	
+	
 }
