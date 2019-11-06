@@ -194,6 +194,8 @@ public class ViewFrame {
 		cards.next(upperPanel);
 		if(!inputPanelShowing) {
 			upperPanelRunning.requestFocusInWindow();
+		}else {
+			inputTextField.requestFocusInWindow();
 		}
 		
 	}
