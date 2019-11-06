@@ -3,23 +3,18 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -30,7 +25,7 @@ public class ViewFrame {
 	JButton runTestsButton;
 	JButton closeThreadButton;
 	JButton clearTextButton;
-	JTextField inputTextField;
+	HintTextField inputTextField;
 	JTextPane testOutputTextPane;
 	JTextArea testSuccessOrFailTextArea;
 	JCheckBox hideTestOutputCheckBox;
@@ -122,7 +117,8 @@ public class ViewFrame {
 		
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BorderLayout());
-		inputTextField = new JTextField("Test1");
+		inputTextField = new HintTextField("Input name of test class");
+		inputTextField.setFont(new Font("Monaco",Font.PLAIN,16));
 		
 		leftPanel.add(inputTextField);
 		
@@ -146,7 +142,6 @@ public class ViewFrame {
 		closeThreadButton = new JButton("Cancel Tests");
 		testProgressBar = new JProgressBar();
 		testProgressBar.setStringPainted(true);
-		testProgressBar.setString("Tests are in progress");
 		runningPanel.add(testProgressBar);
 		runningPanel.add(closeThreadButton);
 		
@@ -163,7 +158,6 @@ public class ViewFrame {
 		try {
 			doc.insertString(doc.getLength(), s, as);
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -208,9 +202,9 @@ public class ViewFrame {
 		testOutputTextPane.setText(null);
 	}
 
-	public void updateProgressBar(Integer nmbrOfFinishedTests) {
+	public void updateProgressBar(Integer nmbrOfFinishedTests, Integer nmbrOfTestMethods) {
 		testProgressBar.setValue(nmbrOfFinishedTests);
-		
+		testProgressBar.setString(""+nmbrOfFinishedTests+"/"+nmbrOfTestMethods+" Tests completed");
 	}
 
 	public void clearSuccesOrFailTextField() {

@@ -1,8 +1,5 @@
 import java.awt.AWTEvent;
 import java.awt.Color;
-import java.awt.Event;
-import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +37,7 @@ public class Controller {
 			nmbrOfTestMethods=testMethods.size();
 			viewFrame.setMinMaxProgressBar(0, nmbrOfTestMethods);
 			nmbrOfFinishedTests=0;
+			viewFrame.updateProgressBar(nmbrOfFinishedTests, nmbrOfTestMethods);
 			workers = new ArrayList<TestCheckSwingWorker>(nmbrOfTestMethods);
 			int i=0;
 			for(Method m:testMethods) {
@@ -84,7 +82,6 @@ public class Controller {
 	
 
 	public void CloseThreadButtonPressed(AWTEvent e) {
-		// TODO Check if thread is still running, if so close it
 		this.CloseThreads();
 		this.clear();
 		viewFrame.addToOutputTextField("Tests were Cancelled",null);
@@ -108,8 +105,8 @@ public class Controller {
 		}else {
 			nmbrOfFails++;
 		}
-		viewFrame.addToOutputTextField(testResult.getMethodName()+":",null);
-		String testResultString = (testResult.getResult() ? "SUCCEEDED!" : "FAILED!");
+		viewFrame.addToOutputTextField(testResult.getMethodName()+" :",null);
+		String testResultString = (testResult.getResult() ? " PASSED!" : " FAILED!");
 		StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, testResult.getResult() ? Color.green : Color.red);
 		viewFrame.addToOutputTextField(testResultString,aset);
@@ -119,11 +116,10 @@ public class Controller {
 			viewFrame.addToOutputTextField("\n", null);
 		}
 		if(nmbrOfFinishedTests<nmbrOfTestMethods) {
-			viewFrame.updateProgressBar(nmbrOfFinishedTests);	
+			viewFrame.updateProgressBar(nmbrOfFinishedTests,nmbrOfTestMethods);	
 		}else {
 			viewFrame.setSuccessAndFails(nmbrOfSuccesses, nmbrOfFails);
 			viewFrame.switchUpperPanels();
-			viewFrame.updateProgressBar(0);
 			
 		}
 		
