@@ -30,6 +30,7 @@ public class Controller {
 		if(this.InitTestChecker(className)) {
 			testMethods=testChecker.getTestMethods();
 			nmbrOfTestMethods=testMethods.size();
+			viewFrame.setMinMaxProgressBar(0, nmbrOfTestMethods);
 			nmbrOfFinishedTests=0;
 			workers = new ArrayList<TestCheckSwingWorker>(nmbrOfTestMethods);
 			int i=0;

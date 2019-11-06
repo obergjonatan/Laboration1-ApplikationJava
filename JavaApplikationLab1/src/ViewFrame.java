@@ -137,6 +137,7 @@ public class ViewFrame {
 		testInProgress = new JTextArea("Tests in Progress");
 		testProgressBar = new JProgressBar();
 		runningPanel.add(testInProgress);
+		runningPanel.add(testProgressBar);
 		runningPanel.add(closeThreadButton);
 		
 		return runningPanel;
