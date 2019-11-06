@@ -54,6 +54,7 @@ public class ViewFrame {
 		
 		mainFrame.setPreferredSize(new Dimension(500,500));
 		mainFrame.pack();
+		middlePanel.requestFocusInWindow();
 		
 		
 		
@@ -118,8 +119,7 @@ public class ViewFrame {
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BorderLayout());
 		inputTextField = new HintTextField("Input name of test class");
-		inputTextField.setFont(new Font("Monaco",Font.PLAIN,16));
-		
+		inputTextField.setFont(new Font("Monaco",Font.PLAIN,16));		
 		leftPanel.add(inputTextField);
 		
 		
