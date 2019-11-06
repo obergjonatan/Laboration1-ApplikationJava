@@ -32,28 +32,18 @@ public class TestCheckSwingWorker extends SwingWorker<TestResult, Integer> {
 		}
 		Boolean methodBool;
 		try {
+			testResult.setMethodName(m.getName());
 			methodBool = (Boolean)m.invoke(obj);
-			if(methodBool) {
-				String testOutput = ""+ m.getName()+":SUCCEEDED \n";
-				testResult.setResultString(testOutput);
-				testResult.setResult(methodBool);
-			}else  {
-				String testOutput = ""+m.getName() +": FAILED \n";
-				testResult.setResultString(testOutput);
-				testResult.setResult(methodBool);
-			} 
+			testResult.setResult(methodBool);
 		} catch (IllegalAccessException e) {
-			String testOutput = ""+m.getName()+": FAILED! Threw IlleagalAccessException \n";
-			testResult.setResultString(testOutput);
 			testResult.setResult(false);
+			testResult.setExceptionThrown(e);
 		} catch (IllegalArgumentException e) {
-			String testOutput = ""+m.getName()+": FAILED! Threw IllegalArgumentException \n";
-			testResult.setResultString(testOutput);
 			testResult.setResult(false);
-		} catch (InvocationTargetException e) {
-			String testOutput = ""+m.getName()+": FAILED! Threw "+e.getTargetException().toString() +"\n";
-			testResult.setResultString(testOutput);
+			testResult.setExceptionThrown(e);
+		} catch (InvocationTargetException e) { 
 			testResult.setResult(false);
+			testResult.setExceptionThrown(e.getTargetException());
 		}
 		if(tearDown!=null) {
 			tearDown.invoke(obj);

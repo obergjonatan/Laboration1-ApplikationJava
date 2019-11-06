@@ -5,16 +5,24 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.JTextArea;
 
 public class ViewFrame {
@@ -23,13 +31,14 @@ public class ViewFrame {
 	JButton closeThreadButton;
 	JButton clearTextButton;
 	JTextField inputTextField;
-	JTextArea testOutputTextArea;
+	JTextPane testOutputTextPane;
 	JTextArea testSuccessOrFailTextArea;
 	JCheckBox hideTestOutputCheckBox;
 	JProgressBar testProgressBar;
+	JPanel upperPanelRunning;
 	JPanel upperPanel;
 	CardLayout cards;
-	
+	Boolean inputPanelShowing=true;
 	
 	
 	// OBSERVE: Should only be called from EDT.
@@ -47,6 +56,7 @@ public class ViewFrame {
 		mainFrame.add(middlePanel,BorderLayout.CENTER);
 		mainFrame.add(lowerPanel,BorderLayout.SOUTH);
 		
+		
 		mainFrame.setPreferredSize(new Dimension(500,500));
 		mainFrame.pack();
 		
@@ -62,7 +72,7 @@ public class ViewFrame {
 		
 		
 		JPanel upperPanelInput = createInputPanel((CardLayout)upperPanel.getLayout(),upperPanel);
-		JPanel upperPanelRunning = createRunningPanel((CardLayout)upperPanel.getLayout(),upperPanel);
+		upperPanelRunning = createRunningPanel((CardLayout)upperPanel.getLayout(),upperPanel);
 		
 		 
 		
@@ -78,13 +88,13 @@ public class ViewFrame {
 		JPanel middlePanel = new JPanel();
 		middlePanel.setBorder(BorderFactory.createTitledBorder("Output"));
 		middlePanel.setLayout(new BorderLayout());
-		testOutputTextArea = new JTextArea("");
-		testOutputTextArea.setBorder(BorderFactory.createTitledBorder("Test Output"));
-		testOutputTextArea.setEditable(false);
+		testOutputTextPane = new JTextPane();
+		testOutputTextPane.setBorder(BorderFactory.createTitledBorder("Test Output"));
+		testOutputTextPane.setEditable(false);
 		testSuccessOrFailTextArea = new JTextArea(4,1);
 		testSuccessOrFailTextArea.setBorder(BorderFactory.createTitledBorder("Test Summary"));
 		testSuccessOrFailTextArea.setEditable(false);
-		middlePanel.add(testOutputTextArea,BorderLayout.CENTER);
+		middlePanel.add(testOutputTextPane,BorderLayout.CENTER);
 		middlePanel.add(testSuccessOrFailTextArea,BorderLayout.SOUTH);
 		middlePanel.setVisible(true);
 		return middlePanel;
@@ -98,7 +108,7 @@ public class ViewFrame {
 			public void itemStateChanged(ItemEvent e) {
 				boolean enabled =
 							e.getStateChange() == ItemEvent.DESELECTED;
-				testOutputTextArea.setVisible(enabled);
+				testOutputTextPane.setVisible(enabled);
 			}
 		});
 		lowerPanel.add(hideTestOutputCheckBox);
@@ -148,18 +158,31 @@ public class ViewFrame {
 		mainFrame.setVisible(true);
 	}
 
-	public void addToOutputTextField(String s) {
-		testOutputTextArea.append(s);	
+	public void addToOutputTextField(String s,AttributeSet as) {
+		Document doc = testOutputTextPane.getDocument();
+		try {
+			doc.insertString(doc.getLength(), s, as);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void setSuccessAndFails(int successes,int fails) {
-		testSuccessOrFailTextArea.setText(" Number of tests passed: " +successes +"\n"+
+		if(fails==0) {
+			testSuccessOrFailTextArea.setText("You passed all "+successes+ " tests! Congratulations!");
+		}else {
+			testSuccessOrFailTextArea.setText("Number of tests passed: " +successes +"\n"+
 											"Number of tests failed: "+fails +"\n");
+		}
 	}
 	
 	public void setLitseners(Controller controller) {
 		runTestsButton.addActionListener(new RunTestButtonLitsener(controller));
 		closeThreadButton.addActionListener(new closeThreadButtonLitsener(controller));
+		inputTextField.addKeyListener(new MyOwnKeyListener(controller));
+		upperPanelRunning.addKeyListener(new MyOtherKeyListener(controller));
+		
 	}
 	
 	public String getInput() {
@@ -167,7 +190,11 @@ public class ViewFrame {
 	}
 
 	public void switchUpperPanels() {
+		inputPanelShowing=!inputPanelShowing;
 		cards.next(upperPanel);
+		if(!inputPanelShowing) {
+			upperPanelRunning.requestFocusInWindow();
+		}
 		
 	}
 	
@@ -176,7 +203,7 @@ public class ViewFrame {
 	}
 
 	public void clearOutputTextField() {
-		testOutputTextArea.setText(null);
+		testOutputTextPane.setText(null);
 	}
 
 	public void updateProgressBar(Integer nmbrOfFinishedTests) {
@@ -193,6 +220,7 @@ public class ViewFrame {
 		testProgressBar.setMinimum(min);
 		testProgressBar.setMaximum(max);
 	}
+	
 	
 	
 }

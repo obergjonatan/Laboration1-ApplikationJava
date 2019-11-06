@@ -1,9 +1,17 @@
+import java.awt.AWTEvent;
+import java.awt.Color;
+import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 public class Controller {
 	private TestChecker testChecker;
@@ -59,7 +67,7 @@ public class Controller {
 			return true;
 	}
 
-	public void RunTestButtonPressed(ActionEvent e) {
+	public void RunTestButtonPressed(AWTEvent e) {
 		
 		this.clear();
 		String className=viewFrame.getInput();
@@ -75,11 +83,11 @@ public class Controller {
 	}
 	
 
-	public void CloseThreadButtonPressed(ActionEvent e) {
+	public void CloseThreadButtonPressed(AWTEvent e) {
 		// TODO Check if thread is still running, if so close it
 		this.CloseThreads();
 		this.clear();
-		viewFrame.addToOutputTextField("Tests were Cancelled");
+		viewFrame.addToOutputTextField("Tests were Cancelled",null);
 		// Should be called from EDT?
 		viewFrame.switchUpperPanels();
 		
@@ -100,7 +108,16 @@ public class Controller {
 		}else {
 			nmbrOfFails++;
 		}
-		viewFrame.addToOutputTextField(testResult.getResultString());
+		viewFrame.addToOutputTextField(testResult.getMethodName()+":",null);
+		String testResultString = (testResult.getResult() ? "SUCCEEDED!" : "FAILED!");
+		StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, testResult.getResult() ? Color.green : Color.red);
+		viewFrame.addToOutputTextField(testResultString,aset);
+		if(testResult.getException()!=null) {
+			viewFrame.addToOutputTextField(" Because of exception :"+testResult.getException().toString()+ "\n", null);
+		}else {
+			viewFrame.addToOutputTextField("\n", null);
+		}
 		if(nmbrOfFinishedTests<nmbrOfTestMethods) {
 			viewFrame.updateProgressBar(nmbrOfFinishedTests);	
 		}else {
