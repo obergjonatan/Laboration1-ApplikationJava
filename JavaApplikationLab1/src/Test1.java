@@ -26,6 +26,23 @@ public class Test1 implements TestClass {
 
 	}
 	
+	public boolean testSleep() throws InterruptedException {
+			Thread.sleep(10000);
+		return true;
+		
+	}
+	
+	public boolean testSleep2() throws InterruptedException {
+			Thread.sleep(10000);
+		return true;
+	}
+	
+	public boolean testSleep3() throws InterruptedException {
+			Thread.sleep(10000);
+		
+		return true;
+	}
+	
 	//Test that should succeed
 	public boolean testDecrement() {
 		   myInt.increment();

@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 
@@ -25,6 +26,7 @@ public class ViewFrame {
 	JTextArea testOutputTextArea;
 	JTextArea testSuccessOrFailTextArea;
 	JCheckBox hideTestOutputCheckBox;
+	JProgressBar testProgressBar;
 	JPanel upperPanel;
 	CardLayout cards;
 	
@@ -133,6 +135,7 @@ public class ViewFrame {
 		runningPanel.setLayout(new FlowLayout());
 		closeThreadButton = new JButton("Cancel Tests");
 		testInProgress = new JTextArea("Tests in Progress");
+		testProgressBar = new JProgressBar();
 		runningPanel.add(testInProgress);
 		runningPanel.add(closeThreadButton);
 		
@@ -173,6 +176,21 @@ public class ViewFrame {
 
 	public void clearOutputTextField() {
 		testOutputTextArea.setText(null);
+	}
+
+	public void updateProgressBar(Integer nmbrOfFinishedTests) {
+		testProgressBar.setValue(nmbrOfFinishedTests);
+		
+	}
+
+	public void clearSuccesOrFailTextField() {
+		testSuccessOrFailTextArea.setText(null);
+		
+	}
+	
+	public void setMinMaxProgressBar(int min, int max) {
+		testProgressBar.setMinimum(min);
+		testProgressBar.setMaximum(max);
 	}
 	
 	

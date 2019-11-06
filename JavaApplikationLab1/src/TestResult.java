@@ -1,33 +1,23 @@
 import java.util.Collection;
 
 public class TestResult {
-	int numberOfSuccesses=0;
-	int numberOfFails=0;
-	Collection<String> resultStringCollection;
-	public TestResult(Collection<String> resultString) {
-		this.resultStringCollection=resultString;
+	boolean result;
+	String resultString;
+
+	
+	public void setResultString(String s) {
+		resultString=s;
 	}
 	
-	public void addToCollection(String s)  {
-		resultStringCollection.add(s);
-	}
-	public void incrementSuccesses() {
-		numberOfSuccesses++;
+	public void setResult(boolean result) {
+		this.result=result;
 	}
 	
-	public void incrementFails() {
-		numberOfFails++;
-	}
-	
-	public Collection<String> getCollection(){
-		return resultStringCollection;
+	public String getResultString(){
+		return resultString;
 	}
 
-	public int getSuccesses() {
-		return numberOfSuccesses;
-	}
-	
-	public int getFails() {
-		return numberOfFails;
+	public boolean getResult() {
+		return result;
 	}
 }
