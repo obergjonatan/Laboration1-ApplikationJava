@@ -10,7 +10,7 @@ public class TestChecker {
 	
 	public TestChecker(String className,Controller controller) throws ClassNotFoundException, ClassNotTestClassException {
 		testClass = Class.forName(className);
-		if(testClass.isAssignableFrom(TestClass.class)) {
+		if(!TestClass.class.isAssignableFrom(testClass)) {
 			throw new ClassNotTestClassException("Class must implement interface TestClass");
 		}
 		
