@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -22,7 +23,6 @@ public class ViewFrame {
 	JButton closeThreadButton;
 	JButton clearTextButton;
 	JTextField inputTextField;
-	JTextArea testInProgress;
 	JTextArea testOutputTextArea;
 	JTextArea testSuccessOrFailTextArea;
 	JCheckBox hideTestOutputCheckBox;
@@ -47,6 +47,8 @@ public class ViewFrame {
 		mainFrame.add(middlePanel,BorderLayout.CENTER);
 		mainFrame.add(lowerPanel,BorderLayout.SOUTH);
 		
+		mainFrame.setPreferredSize(new Dimension(500,500));
+		mainFrame.pack();
 		
 		
 		
@@ -76,12 +78,10 @@ public class ViewFrame {
 		JPanel middlePanel = new JPanel();
 		middlePanel.setBorder(BorderFactory.createTitledBorder("Output"));
 		middlePanel.setLayout(new BorderLayout());
-		testOutputTextArea = new JTextArea("Output Text Area");
+		testOutputTextArea = new JTextArea("");
 		testOutputTextArea.setBorder(BorderFactory.createTitledBorder("Test Output"));
 		testOutputTextArea.setEditable(false);
-		testSuccessOrFailTextArea = new JTextArea("Total Number of Tests : \n"
-				+ "Number of Fails: \n"
-				+ "Number of Successes: \n");
+		testSuccessOrFailTextArea = new JTextArea(4,1);
 		testSuccessOrFailTextArea.setBorder(BorderFactory.createTitledBorder("Test Summary"));
 		testSuccessOrFailTextArea.setEditable(false);
 		middlePanel.add(testOutputTextArea,BorderLayout.CENTER);
@@ -134,9 +134,9 @@ public class ViewFrame {
 		JPanel runningPanel = new JPanel();
 		runningPanel.setLayout(new FlowLayout());
 		closeThreadButton = new JButton("Cancel Tests");
-		testInProgress = new JTextArea("Tests in Progress");
 		testProgressBar = new JProgressBar();
-		runningPanel.add(testInProgress);
+		testProgressBar.setStringPainted(true);
+		testProgressBar.setString("Tests are in progress");
 		runningPanel.add(testProgressBar);
 		runningPanel.add(closeThreadButton);
 		
