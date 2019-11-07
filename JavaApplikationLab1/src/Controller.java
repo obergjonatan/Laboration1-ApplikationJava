@@ -69,6 +69,7 @@ public class Controller {
 		
 		this.clear();
 		String className=viewFrame.getInput();
+		System.out.println(className);
 		if(className == null || className.trim().equals("")) {
 			viewFrame.popupError("You must enter a classname");
 		}else {

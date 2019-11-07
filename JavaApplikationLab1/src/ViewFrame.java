@@ -4,15 +4,22 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.text.AttributeSet;
@@ -29,6 +36,7 @@ public class ViewFrame {
 	JTextPane testOutputTextPane;
 	JTextArea testSuccessOrFailTextArea;
 	JCheckBox hideTestOutputCheckBox;
+	JScrollPane scrollableTextArea;
 	JProgressBar testProgressBar;
 	JPanel upperPanelRunning;
 	JPanel upperPanel;
@@ -43,6 +51,11 @@ public class ViewFrame {
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setLayout(new BorderLayout());
 		
+		JMenuBar menuBar = new JMenuBar();
+		JMenu menu = createMenu();
+		menuBar.add(menu);
+		mainFrame.setJMenuBar(menuBar);
+		
 		JPanel upperPanel = createUpperPanel();
 		JPanel middlePanel = createMiddlePanel();
 		JPanel lowerPanel = createLowerPanel();
@@ -51,6 +64,8 @@ public class ViewFrame {
 		mainFrame.add(middlePanel,BorderLayout.CENTER);
 		mainFrame.add(lowerPanel,BorderLayout.SOUTH);
 		
+		mainFrame.setFont(new Font("Lucida Console",Font.BOLD,16));
+		ChangeFont.changeFont(mainFrame, "Arial");
 		
 		mainFrame.setPreferredSize(new Dimension(500,500));
 		mainFrame.pack();
@@ -60,6 +75,14 @@ public class ViewFrame {
 		
 	}
 	
+	private JMenu createMenu() {
+		JMenu menu=new JMenu("Settings");
+		JMenu fontsMenu=new FontMenu("Change Fonts",mainFrame);
+		MenuScroller menuScroller=MenuScroller.setScrollerFor(fontsMenu);
+		menu.add(fontsMenu);
+		return menu;
+	}
+
 	private JPanel createUpperPanel() {
 		upperPanel = new JPanel();
 		cards = new CardLayout();
@@ -87,10 +110,12 @@ public class ViewFrame {
 		testOutputTextPane = new JTextPane();
 		testOutputTextPane.setBorder(BorderFactory.createTitledBorder("Test Output"));
 		testOutputTextPane.setEditable(false);
+		scrollableTextArea = new JScrollPane(testOutputTextPane,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		testSuccessOrFailTextArea = new JTextArea(4,1);
 		testSuccessOrFailTextArea.setBorder(BorderFactory.createTitledBorder("Test Summary"));
 		testSuccessOrFailTextArea.setEditable(false);
-		middlePanel.add(testOutputTextPane,BorderLayout.CENTER);
+		//middlePanel.add(testOutputTextPane,BorderLayout.CENTER);
+		middlePanel.add(scrollableTextArea,BorderLayout.CENTER);
 		middlePanel.add(testSuccessOrFailTextArea,BorderLayout.SOUTH);
 		middlePanel.setVisible(true);
 		return middlePanel;
@@ -118,8 +143,8 @@ public class ViewFrame {
 		
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BorderLayout());
-		inputTextField = new HintTextField("Input name of test class");
-		inputTextField.setFont(new Font("Monaco",Font.PLAIN,16));		
+		inputTextField = new HintTextField();
+		inputTextField.setFont(new Font("Lucida Console",Font.PLAIN,16));		
 		leftPanel.add(inputTextField);
 		
 		
