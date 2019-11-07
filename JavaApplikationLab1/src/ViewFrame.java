@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -8,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Stack;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -51,14 +54,10 @@ public class ViewFrame {
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setLayout(new BorderLayout());
 		
-		JMenuBar menuBar = new JMenuBar();
-		JMenu menu = createMenu();
-		menuBar.add(menu);
-		mainFrame.setJMenuBar(menuBar);
-		
 		JPanel upperPanel = createUpperPanel();
 		JPanel middlePanel = createMiddlePanel();
 		JPanel lowerPanel = createLowerPanel();
+		
 		
 		mainFrame.add(upperPanel,BorderLayout.NORTH);
 		mainFrame.add(middlePanel,BorderLayout.CENTER);
@@ -66,6 +65,12 @@ public class ViewFrame {
 		
 		mainFrame.setFont(new Font("Lucida Console",Font.BOLD,16));
 		ChangeFont.changeFont(mainFrame, "Arial");
+		
+
+		JMenuBar menuBar = new JMenuBar();
+		JMenu menu = createMenu();
+		menuBar.add(menu);
+		mainFrame.setJMenuBar(menuBar);
 		
 		mainFrame.setPreferredSize(new Dimension(500,500));
 		mainFrame.pack();
@@ -77,7 +82,11 @@ public class ViewFrame {
 	
 	private JMenu createMenu() {
 		JMenu menu=new JMenu("Settings");
-		JMenu fontsMenu=new FontMenu("Change Fonts",mainFrame);
+		Stack<Container> containers= new Stack<>();
+		containers.add(testOutputTextPane);
+		containers.add(inputTextField);
+		containers.add(testSuccessOrFailTextArea);
+		JMenu fontsMenu=new FontMenu("Change Fonts",containers);
 		MenuScroller menuScroller=MenuScroller.setScrollerFor(fontsMenu);
 		menu.add(fontsMenu);
 		return menu;
@@ -241,6 +250,7 @@ public class ViewFrame {
 		testProgressBar.setMinimum(min);
 		testProgressBar.setMaximum(max);
 	}
+	
 	
 	
 	

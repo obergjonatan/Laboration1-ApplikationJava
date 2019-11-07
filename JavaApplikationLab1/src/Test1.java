@@ -58,26 +58,6 @@ public class Test1 implements TestClass {
 		
 	}
 	
-	public boolean testFailingByException1() {
-		myInt=null;
-		myInt.decrement();
-		return true;
-		
-	}
-	
-	public boolean testFailingByException2() {
-		myInt=null;
-		myInt.decrement();
-		return true;
-		
-	}
-	
-	public boolean testFailingByException3() {
-		myInt=null;
-		myInt.decrement();
-		return true;
-		
-	}
 	
 	//Test that should fail
 	public boolean testFailing() {

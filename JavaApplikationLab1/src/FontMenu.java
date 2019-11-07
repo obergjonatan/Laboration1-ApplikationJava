@@ -33,7 +33,6 @@ public class FontMenu extends JMenu {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					System.out.println(((JMenuItem)e.getSource()).getText());
 					for(Container c:containers) {
 						ChangeFont.changeFont(c,((JMenuItem)e.getSource()).getText());
 					}
