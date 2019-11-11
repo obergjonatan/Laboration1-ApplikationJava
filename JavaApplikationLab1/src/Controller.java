@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Stack;
+import java.util.concurrent.Semaphore;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -19,6 +21,9 @@ public class Controller {
 	private List<TestCheckSwingWorker> workers;
 	private Integer nmbrOfSuccesses=0;
 	private Integer nmbrOfFails=0;
+	private ArrayList<String> publishedMethodNames=new ArrayList<>();
+	public  Semaphore runPermit= new Semaphore(1);
+	public boolean runInOrder;
 	
 	
 	public Controller(ViewFrame viewFrame) {
@@ -39,18 +44,28 @@ public class Controller {
 			nmbrOfFinishedTests=0;
 			viewFrame.updateProgressBar(nmbrOfFinishedTests, nmbrOfTestMethods);
 			workers = new ArrayList<TestCheckSwingWorker>(nmbrOfTestMethods);
+			Stack<Method> testMethodSingles;
 			int i=0;
-			for(Method m:testMethods) {
-				workers.add(new TestCheckSwingWorker(m,testChecker.getTestClass(),
+			if(runInOrder) {
+				workers.add(new TestCheckSwingWorker(testMethods,testChecker.getTestClass(),
 						testChecker.getSetUp(),testChecker.getTearDown(),this));
-				workers.get(i).execute();
-				i++;
+				workers.get(i).execute();	
+			}else{
+				for(Method m:testMethods) {
+					testMethodSingles=new Stack<>();
+					testMethodSingles.add(m);
+					workers.add(new TestCheckSwingWorker(testMethodSingles,testChecker.getTestClass(),
+							testChecker.getSetUp(),testChecker.getTearDown(),this));
+					workers.get(i).execute();	
+					i++;
+				}
 			}
 			return true;
 		}
 		return false;
-		
 	}
+		
+
 	
 	private boolean InitTestChecker(String className) {
 			try {
@@ -65,9 +80,9 @@ public class Controller {
 			return true;
 	}
 
-	public void RunTestButtonPressed(AWTEvent e) {
-		
+	public void RunTestButtonPressed(AWTEvent e,boolean runInOrder) {
 		this.clear();
+		this.runInOrder=runInOrder;
 		String className=viewFrame.getInput();
 		System.out.println(className);
 		if(className == null || className.trim().equals("")) {
@@ -97,33 +112,38 @@ public class Controller {
 		nmbrOfFinishedTests=0;
 		nmbrOfSuccesses=0;
 		nmbrOfFails=0;
+		publishedMethodNames=new ArrayList<String>();
 	}
 
-	public void updateOutput(TestResult testResult) {
-		nmbrOfFinishedTests++;
-		if(testResult.getResult()) {
-			nmbrOfSuccesses++;
-		}else {
-			nmbrOfFails++;
+	public void updateOutput(Collection<TestResult> testResults) {
+		for(TestResult tr:testResults){
+			if(!publishedMethodNames.contains(tr.getMethodName())){
+				publishedMethodNames.add(tr.getMethodName());
+				nmbrOfFinishedTests++;
+				if(tr.getResult()) {
+					nmbrOfSuccesses++;
+				}else {
+					nmbrOfFails++;
+				}
+				viewFrame.addToOutputTextField(tr.getMethodName()+" :",null);
+				String testResultString = (tr.getResult() ? " PASSED!" : " FAILED!");
+				StyleContext sc = StyleContext.getDefaultStyleContext();
+		        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, tr.getResult() ? Color.green : Color.red);
+				viewFrame.addToOutputTextField(testResultString,aset);
+				if(tr.getException()!=null) {
+					viewFrame.addToOutputTextField(" Because of exception :"+tr.getException().toString()+ "\n", null);
+				}else {
+					viewFrame.addToOutputTextField("\n", null);
+				}
+				if(nmbrOfFinishedTests<nmbrOfTestMethods) {
+					viewFrame.updateProgressBar(nmbrOfFinishedTests,nmbrOfTestMethods);	
+				}else {
+					viewFrame.setSuccessAndFails(nmbrOfSuccesses, nmbrOfFails);
+					viewFrame.switchUpperPanels();
+					
+				}
+			}
 		}
-		viewFrame.addToOutputTextField(testResult.getMethodName()+" :",null);
-		String testResultString = (testResult.getResult() ? " PASSED!" : " FAILED!");
-		StyleContext sc = StyleContext.getDefaultStyleContext();
-        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, testResult.getResult() ? Color.green : Color.red);
-		viewFrame.addToOutputTextField(testResultString,aset);
-		if(testResult.getException()!=null) {
-			viewFrame.addToOutputTextField(" Because of exception :"+testResult.getException().toString()+ "\n", null);
-		}else {
-			viewFrame.addToOutputTextField("\n", null);
-		}
-		if(nmbrOfFinishedTests<nmbrOfTestMethods) {
-			viewFrame.updateProgressBar(nmbrOfFinishedTests,nmbrOfTestMethods);	
-		}else {
-			viewFrame.setSuccessAndFails(nmbrOfSuccesses, nmbrOfFails);
-			viewFrame.switchUpperPanels();
-			
-		}
-		
 		
 	}
 

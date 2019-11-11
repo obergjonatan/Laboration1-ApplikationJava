@@ -21,6 +21,7 @@ public class TestChecker {
 		Method allMethods[] = testClass.getMethods();
 		for(Method m:allMethods) {
 			String methodName=m.getName();
+			System.out.println(methodName);
 			if(methodName.equals("setUp")) {
 				setUp=m;
 			}else if(methodName.equals("tearDown")) {

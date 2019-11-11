@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -25,6 +26,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.border.BevelBorder;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -39,12 +41,14 @@ public class ViewFrame {
 	JTextPane testOutputTextPane;
 	JTextArea testSuccessOrFailTextArea;
 	JCheckBox hideTestOutputCheckBox;
+	JCheckBox runTestsInOrder;
 	JScrollPane scrollableTextArea;
 	JProgressBar testProgressBar;
 	JPanel upperPanelRunning;
 	JPanel upperPanel;
 	CardLayout cards;
 	Boolean inputPanelShowing=true;
+	Boolean runTestInOrder;
 	
 	
 	// OBSERVE: Should only be called from EDT.
@@ -95,7 +99,7 @@ public class ViewFrame {
 	private JPanel createUpperPanel() {
 		upperPanel = new JPanel();
 		cards = new CardLayout();
-		upperPanel.setBorder(BorderFactory.createTitledBorder("Input"));
+		upperPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 		upperPanel.setLayout(cards);
 		
 		
@@ -114,7 +118,8 @@ public class ViewFrame {
 	
 	private JPanel createMiddlePanel() {
 		JPanel middlePanel = new JPanel();
-		middlePanel.setBorder(BorderFactory.createTitledBorder("Output"));
+		middlePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); 
+
 		middlePanel.setLayout(new BorderLayout());
 		testOutputTextPane = new JTextPane();
 		testOutputTextPane.setBorder(BorderFactory.createTitledBorder("Test Output"));
@@ -159,9 +164,13 @@ public class ViewFrame {
 		
 		
 		JPanel rightPanel = new JPanel();
-		rightPanel.setLayout(new FlowLayout());
+		rightPanel.setLayout(new GridLayout(1,2));
 		runTestsButton = new JButton("Run Tests");
+		runTestsInOrder = new JCheckBox("Run Tests In Order");
+		
+		
 		rightPanel.add(runTestsButton);
+		rightPanel.add(runTestsInOrder);
 		
 		
 		inputPanel.add(leftPanel,BorderLayout.CENTER);
@@ -206,9 +215,9 @@ public class ViewFrame {
 	}
 	
 	public void setLitseners(Controller controller) {
-		runTestsButton.addActionListener(new RunTestButtonLitsener(controller));
+		runTestsButton.addActionListener(new RunTestButtonLitsener(controller,runTestsInOrder));
 		closeThreadButton.addActionListener(new closeThreadButtonLitsener(controller));
-		inputTextField.addKeyListener(new MyOwnKeyListener(controller));
+		inputTextField.addKeyListener(new MyOwnKeyListener(controller,runTestsInOrder));
 		upperPanelRunning.addKeyListener(new MyOtherKeyListener(controller));
 		
 	}

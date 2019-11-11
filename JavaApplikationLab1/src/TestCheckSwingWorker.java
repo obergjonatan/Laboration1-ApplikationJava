@@ -1,19 +1,23 @@
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
-public class TestCheckSwingWorker extends SwingWorker<TestResult, Integer> {
+public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>, TestResult> {
 
-	Method testMethod;
+	Iterable<Method> testMethod;
 	Class<?> testClass;
 	Method setUp;
 	Method tearDown;
 	Controller controller;
-	public TestCheckSwingWorker(Method m,Class<?> c,Method setUp,Method tearDown,Controller controller) {
-		this.testMethod=m;
+	Boolean runInOrder;
+	public TestCheckSwingWorker(Iterable<Method> methods,Class<?> c,Method setUp,Method tearDown,Controller controller) {
+		this.testMethod=methods;
 		this.testClass=c;
 		this.setUp=setUp;
 		this.tearDown=tearDown;
@@ -22,33 +26,37 @@ public class TestCheckSwingWorker extends SwingWorker<TestResult, Integer> {
 		
 	}
 	@Override
-	protected TestResult doInBackground() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	protected Collection<TestResult> doInBackground() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		Object obj = testClass.getDeclaredConstructor().newInstance();
-		TestResult testResult = new TestResult();
-		Method m = testMethod;
-		
-		if(setUp!=null) {
-			setUp.invoke(obj);	
+		Stack<TestResult> testResults = new Stack();
+		for(Method m:testMethod) {
+			
+			TestResult testResult= new TestResult();
+			if(setUp!=null) {
+				setUp.invoke(obj);	
+			}
+			Boolean methodBool;
+			try {
+				testResult.setMethodName(m.getName());
+				methodBool = (Boolean)m.invoke(obj);
+				testResult.setResult(methodBool);
+			} catch (IllegalAccessException e) {
+				testResult.setResult(false);
+				testResult.setExceptionThrown(e);
+			} catch (IllegalArgumentException e) {
+				testResult.setResult(false);
+				testResult.setExceptionThrown(e);
+			} catch (InvocationTargetException e) { 
+				testResult.setResult(false);
+				testResult.setExceptionThrown(e.getTargetException());
+			}
+			if(tearDown!=null) {
+				tearDown.invoke(obj);
+			}	
+			publish(testResult);
+			testResults.add(testResult);
 		}
-		Boolean methodBool;
-		try {
-			testResult.setMethodName(m.getName());
-			methodBool = (Boolean)m.invoke(obj);
-			testResult.setResult(methodBool);
-		} catch (IllegalAccessException e) {
-			testResult.setResult(false);
-			testResult.setExceptionThrown(e);
-		} catch (IllegalArgumentException e) {
-			testResult.setResult(false);
-			testResult.setExceptionThrown(e);
-		} catch (InvocationTargetException e) { 
-			testResult.setResult(false);
-			testResult.setExceptionThrown(e.getTargetException());
-		}
-		if(tearDown!=null) {
-			tearDown.invoke(obj);
-		}	
-		return testResult;
+		return testResults;
 	}
 	@Override
 	protected void done() {
@@ -63,6 +71,10 @@ public class TestCheckSwingWorker extends SwingWorker<TestResult, Integer> {
 		} catch (CancellationException e) {
 			
 		}
+	}
+	
+	@Override protected void process(List<TestResult> testResults) {
+		controller.updateOutput(testResults);
 	}
 
 }
