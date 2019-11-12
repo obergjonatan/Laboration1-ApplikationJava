@@ -15,8 +15,11 @@ public class MyDocFilter extends DocumentFilter{
 
 	
 	@Override
-	public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attr) throws BadLocationException {
-		if(hint.equals(fb.getDocument().getText(0, fb.getDocument().getLength()))){
+	public void replace(FilterBypass fb, int offset, int length,
+						String text, AttributeSet attr)
+								throws BadLocationException {
+		if(hint.equals(
+				fb.getDocument().getText(0, fb.getDocument().getLength()))){
 			hintTextField.setForeground(null);
 			hintTextField.setShowingHint(false);
 			super.replace(fb,0,fb.getDocument().getLength(),text,attr);

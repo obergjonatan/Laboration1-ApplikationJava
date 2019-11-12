@@ -14,7 +14,8 @@ public class HintTextField extends JTextField implements FocusListener {
 		this.hint=GlobalVariables.hintMessage;
 		super.addFocusListener(this);
 		this.showingHint=true;
-		((AbstractDocument) this.getDocument()).setDocumentFilter(new MyDocFilter(this));
+		((AbstractDocument) this.getDocument()).setDocumentFilter(
+				new MyDocFilter(this));
 	}
 	@Override
 	public void focusGained(FocusEvent e) {

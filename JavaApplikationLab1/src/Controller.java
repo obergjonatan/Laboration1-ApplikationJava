@@ -13,6 +13,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 public class Controller {
+	public boolean runInOrder;
 	private TestChecker testChecker;
 	private ViewFrame viewFrame;
 	private Collection<Method> testMethods;
@@ -21,9 +22,8 @@ public class Controller {
 	private List<TestCheckSwingWorker> workers;
 	private Integer nmbrOfSuccesses=0;
 	private Integer nmbrOfFails=0;
+	private Integer nmbrOfExceptionFails=0;
 	private ArrayList<String> publishedMethodNames=new ArrayList<>();
-	public  Semaphore runPermit= new Semaphore(1);
-	public boolean runInOrder;
 	
 	
 	public Controller(ViewFrame viewFrame) {
@@ -47,15 +47,17 @@ public class Controller {
 			Stack<Method> testMethodSingles;
 			int i=0;
 			if(runInOrder) {
-				workers.add(new TestCheckSwingWorker(testMethods,testChecker.getTestClass(),
-						testChecker.getSetUp(),testChecker.getTearDown(),this));
+				workers.add(new TestCheckSwingWorker(testMethods,
+						testChecker.getTestClass(),testChecker.getSetUp(),
+						testChecker.getTearDown(),this));
 				workers.get(i).execute();	
 			}else{
 				for(Method m:testMethods) {
 					testMethodSingles=new Stack<>();
 					testMethodSingles.add(m);
-					workers.add(new TestCheckSwingWorker(testMethodSingles,testChecker.getTestClass(),
-							testChecker.getSetUp(),testChecker.getTearDown(),this));
+					workers.add(new TestCheckSwingWorker(testMethodSingles,
+							testChecker.getTestClass(),testChecker.getSetUp(),
+							testChecker.getTearDown(),this));
 					workers.get(i).execute();	
 					i++;
 				}
@@ -112,6 +114,7 @@ public class Controller {
 		nmbrOfFinishedTests=0;
 		nmbrOfSuccesses=0;
 		nmbrOfFails=0;
+		nmbrOfExceptionFails=0;
 		publishedMethodNames=new ArrayList<String>();
 	}
 
@@ -122,23 +125,31 @@ public class Controller {
 				nmbrOfFinishedTests++;
 				if(tr.getResult()) {
 					nmbrOfSuccesses++;
-				}else {
+				}else if(tr.getException()==null){
 					nmbrOfFails++;
+				}else {
+					nmbrOfExceptionFails++;
 				}
 				viewFrame.addToOutputTextField(tr.getMethodName()+" :",null);
-				String testResultString = (tr.getResult() ? " PASSED!" : " FAILED!");
+				String testResultString = 
+						(tr.getResult() ? " PASSED!" : " FAILED!");
 				StyleContext sc = StyleContext.getDefaultStyleContext();
-		        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, tr.getResult() ? Color.green : Color.red);
+		        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
+		        		StyleConstants.Foreground,
+		        		tr.getResult() ? Color.green : Color.red);
 				viewFrame.addToOutputTextField(testResultString,aset);
 				if(tr.getException()!=null) {
-					viewFrame.addToOutputTextField(" Because of exception :"+tr.getException().toString()+ "\n", null);
+					viewFrame.addToOutputTextField(" Because of exception :"
+							+tr.getException().toString()+ "\n", null);
 				}else {
 					viewFrame.addToOutputTextField("\n", null);
 				}
 				if(nmbrOfFinishedTests<nmbrOfTestMethods) {
-					viewFrame.updateProgressBar(nmbrOfFinishedTests,nmbrOfTestMethods);	
+					viewFrame.updateProgressBar(nmbrOfFinishedTests,
+												nmbrOfTestMethods);	
 				}else {
-					viewFrame.setSuccessAndFails(nmbrOfSuccesses, nmbrOfFails);
+					viewFrame.setSuccessAndFails(nmbrOfSuccesses,
+							nmbrOfFails,nmbrOfExceptionFails);
 					viewFrame.switchUpperPanels();
 					
 				}

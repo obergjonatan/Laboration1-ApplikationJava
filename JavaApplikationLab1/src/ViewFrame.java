@@ -99,12 +99,15 @@ public class ViewFrame {
 	private JPanel createUpperPanel() {
 		upperPanel = new JPanel();
 		cards = new CardLayout();
-		upperPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+		upperPanel.setBorder(BorderFactory.createBevelBorder(
+				BevelBorder.RAISED));
 		upperPanel.setLayout(cards);
 		
 		
-		JPanel upperPanelInput = createInputPanel((CardLayout)upperPanel.getLayout(),upperPanel);
-		upperPanelRunning = createRunningPanel((CardLayout)upperPanel.getLayout(),upperPanel);
+		JPanel upperPanelInput = 
+				createInputPanel((CardLayout)upperPanel.getLayout(),upperPanel);
+		upperPanelRunning = createRunningPanel(
+				(CardLayout)upperPanel.getLayout(),upperPanel);
 		
 		 
 		
@@ -122,11 +125,15 @@ public class ViewFrame {
 
 		middlePanel.setLayout(new BorderLayout());
 		testOutputTextPane = new JTextPane();
-		testOutputTextPane.setBorder(BorderFactory.createTitledBorder("Test Output"));
+		testOutputTextPane.setBorder(
+				BorderFactory.createTitledBorder("Test Output"));
 		testOutputTextPane.setEditable(false);
-		scrollableTextArea = new JScrollPane(testOutputTextPane,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollableTextArea = new JScrollPane(testOutputTextPane,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		testSuccessOrFailTextArea = new JTextArea(4,1);
-		testSuccessOrFailTextArea.setBorder(BorderFactory.createTitledBorder("Test Summary"));
+		testSuccessOrFailTextArea.setBorder(
+				BorderFactory.createTitledBorder("Test Summary"));
 		testSuccessOrFailTextArea.setEditable(false);
 		//middlePanel.add(testOutputTextPane,BorderLayout.CENTER);
 		middlePanel.add(scrollableTextArea,BorderLayout.CENTER);
@@ -205,19 +212,24 @@ public class ViewFrame {
 		}
 	}
 	
-	public void setSuccessAndFails(int successes,int fails) {
-		if(fails==0) {
-			testSuccessOrFailTextArea.setText("You passed all "+successes+ " tests! Congratulations!");
+	public void setSuccessAndFails(int successes,int fails,int exceptions) {
+		if(fails==0&&exceptions==0) {
+			testSuccessOrFailTextArea.setText("You passed all "+successes+ 
+					" tests! Congratulations!");
 		}else {
-			testSuccessOrFailTextArea.setText("Number of tests passed: " +successes +"\n"+
-											"Number of tests failed: "+fails +"\n");
+			testSuccessOrFailTextArea.setText("Number of tests passed: "
+					+successes +"\n"+ "Number of tests failed: "+fails +"\n"+
+					"Number of tests failed with exception: "+exceptions);
 		}
 	}
 	
 	public void setLitseners(Controller controller) {
-		runTestsButton.addActionListener(new RunTestButtonLitsener(controller,runTestsInOrder));
-		closeThreadButton.addActionListener(new closeThreadButtonLitsener(controller));
-		inputTextField.addKeyListener(new MyOwnKeyListener(controller,runTestsInOrder));
+		runTestsButton.addActionListener(
+				new RunTestButtonLitsener(controller,runTestsInOrder));
+		closeThreadButton.addActionListener(
+				new closeThreadButtonLitsener(controller));
+		inputTextField.addKeyListener(
+				new MyOwnKeyListener(controller,runTestsInOrder));
 		upperPanelRunning.addKeyListener(new MyOtherKeyListener(controller));
 		
 	}
@@ -238,16 +250,19 @@ public class ViewFrame {
 	}
 	
 	public void popupError(String errorMessage) {
-		JOptionPane.showMessageDialog(mainFrame,errorMessage,"Error",JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(mainFrame,errorMessage,"Error",
+									  JOptionPane.ERROR_MESSAGE);
 	}
 
 	public void clearOutputTextField() {
 		testOutputTextPane.setText(null);
 	}
 
-	public void updateProgressBar(Integer nmbrOfFinishedTests, Integer nmbrOfTestMethods) {
+	public void updateProgressBar(Integer nmbrOfFinishedTests,
+							      Integer nmbrOfTestMethods) {
 		testProgressBar.setValue(nmbrOfFinishedTests);
-		testProgressBar.setString(""+nmbrOfFinishedTests+"/"+nmbrOfTestMethods+" Tests completed");
+		testProgressBar.setString(""+nmbrOfFinishedTests+"/"+nmbrOfTestMethods+
+								  " Tests completed");
 	}
 
 	public void clearSuccesOrFailTextField() {

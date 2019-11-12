@@ -15,15 +15,14 @@ import javax.swing.JMenuItem;
 
 public class FontMenu extends JMenu {
 	private String fonts[];
-	private Iterable<Container> containers;
 	
 	public FontMenu(String menuName,Container container) {
 		this(menuName,new ArrayList<Container>(Arrays.asList(container)));
 	}
 	public FontMenu(String menuName,Iterable<Container> containers) {
 		super(menuName);
-		this.containers=containers;
-		fonts= GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+		fonts= GraphicsEnvironment.getLocalGraphicsEnvironment().
+				getAvailableFontFamilyNames();
 		JMenuItem menuItems[] = new JMenuItem[fonts.length];
 		for(int i=0 ; i<fonts.length ; i++) {
 			Font font = new Font(fonts[i],Font.PLAIN,16);
@@ -34,7 +33,8 @@ public class FontMenu extends JMenu {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					for(Container c:containers) {
-						ChangeFont.changeFont(c,((JMenuItem)e.getSource()).getText());
+						ChangeFont.changeFont(c,
+								((JMenuItem)e.getSource()).getText());
 					}
 				}
 				

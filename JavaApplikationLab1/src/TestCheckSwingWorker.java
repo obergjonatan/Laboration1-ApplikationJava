@@ -8,7 +8,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
-public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>, TestResult> {
+public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>,
+													  TestResult> {
 
 	Iterable<Method> testMethod;
 	Class<?> testClass;
@@ -16,7 +17,8 @@ public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>, Te
 	Method tearDown;
 	Controller controller;
 	Boolean runInOrder;
-	public TestCheckSwingWorker(Iterable<Method> methods,Class<?> c,Method setUp,Method tearDown,Controller controller) {
+	public TestCheckSwingWorker(Iterable<Method> methods,Class<?> c,
+			Method setUp,Method tearDown,Controller controller) {
 		this.testMethod=methods;
 		this.testClass=c;
 		this.setUp=setUp;
@@ -26,7 +28,10 @@ public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>, Te
 		
 	}
 	@Override
-	protected Collection<TestResult> doInBackground() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	protected Collection<TestResult> doInBackground() 
+			throws InstantiationException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException,
+			NoSuchMethodException, SecurityException {
 		Object obj = testClass.getDeclaredConstructor().newInstance();
 		Stack<TestResult> testResults = new Stack();
 		for(Method m:testMethod) {
@@ -74,7 +79,9 @@ public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>, Te
 	}
 	
 	@Override protected void process(List<TestResult> testResults) {
-		controller.updateOutput(testResults);
+		if(!this.isCancelled()) {
+			controller.updateOutput(testResults);
+		}
 	}
 
 }

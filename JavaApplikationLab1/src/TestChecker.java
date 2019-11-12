@@ -8,14 +8,14 @@ public class TestChecker {
 	private Method tearDown;
 	private Stack<Method> testMethods = new Stack<Method>();
 	
-	public TestChecker(String className,Controller controller) throws ClassNotFoundException, ClassNotTestClassException {
+	public TestChecker(String className,Controller controller) 
+			throws ClassNotFoundException, ClassNotTestClassException {
 		testClass = Class.forName(className);
 		if(!TestClass.class.isAssignableFrom(testClass)) {
-			throw new ClassNotTestClassException("Class must implement interface TestClass");
+			throw new ClassNotTestClassException("Doesnt implement TestClass");
 		}
 		
 	}
-	
 	
 	public Collection<Method> getTestMethods() {
 		Method allMethods[] = testClass.getMethods();

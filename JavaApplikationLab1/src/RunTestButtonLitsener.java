@@ -7,7 +7,8 @@ public class RunTestButtonLitsener implements ActionListener {
 	Controller controller;
 	JCheckBox runTestsInOrder;
 
-	public RunTestButtonLitsener(Controller controller,JCheckBox runTestsInOrder) {
+	public RunTestButtonLitsener(Controller controller,
+							     JCheckBox runTestsInOrder) {
 		this.controller=controller;
 		this.runTestsInOrder=runTestsInOrder;
 		
