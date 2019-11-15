@@ -4,20 +4,20 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 
 public class RunTestButtonLitsener implements ActionListener {
-	Controller controller;
+	TestUnitController testUnitController;
 	JCheckBox runTestsInOrder;
 
-	public RunTestButtonLitsener(Controller controller,
+	public RunTestButtonLitsener(TestUnitController testUnitController,
 							     JCheckBox runTestsInOrder) {
-		this.controller=controller;
+		this.testUnitController=testUnitController;
 		this.runTestsInOrder=runTestsInOrder;
 		
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// Call Controller to check that tests actually started. 
-		controller.RunTestButtonPressed(e,runTestsInOrder.isSelected());
+		// Call TestUnitController to check that tests actually started. 
+		testUnitController.RunTestButtonPressed(e,runTestsInOrder.isSelected());
 	}
 
 }

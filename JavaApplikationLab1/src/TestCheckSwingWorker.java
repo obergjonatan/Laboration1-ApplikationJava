@@ -15,15 +15,15 @@ public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>,
 	Class<?> testClass;
 	Method setUp;
 	Method tearDown;
-	Controller controller;
+	TestUnitController testUnitController;
 	Boolean runInOrder;
 	public TestCheckSwingWorker(Iterable<Method> methods,Class<?> c,
-			Method setUp,Method tearDown,Controller controller) {
+			Method setUp,Method tearDown,TestUnitController testUnitController) {
 		this.testMethod=methods;
 		this.testClass=c;
 		this.setUp=setUp;
 		this.tearDown=tearDown;
-		this.controller=controller;
+		this.testUnitController=testUnitController;
 		
 		
 	}
@@ -66,7 +66,7 @@ public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>,
 	@Override
 	protected void done() {
 		try {
-			controller.updateOutput(get());
+			testUnitController.updateOutput(get());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
@@ -80,7 +80,7 @@ public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>,
 	
 	@Override protected void process(List<TestResult> testResults) {
 		if(!this.isCancelled()) {
-			controller.updateOutput(testResults);
+			testUnitController.updateOutput(testResults);
 		}
 	}
 

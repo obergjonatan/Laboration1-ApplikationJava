@@ -2,10 +2,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class MyOtherKeyListener implements KeyListener {
-	Controller controller;
+	TestUnitController testUnitController;
 	
-	public MyOtherKeyListener(Controller controller) {
-		this.controller=controller;
+	public MyOtherKeyListener(TestUnitController testUnitController) {
+		this.testUnitController=testUnitController;
 	}
 	
 	@Override
@@ -16,7 +16,7 @@ public class MyOtherKeyListener implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
-			controller.CloseThreadButtonPressed(e);
+			testUnitController.CloseThreadButtonPressed(e);
 		}
 
 	}

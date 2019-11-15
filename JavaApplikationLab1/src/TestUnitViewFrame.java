@@ -6,25 +6,17 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Stack;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.border.BevelBorder;
 import javax.swing.text.AttributeSet;
@@ -32,7 +24,13 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.JTextArea;
 
-public class ViewFrame {
+
+/**
+ * @author Jonatan
+ *
+ */
+
+public class TestUnitViewFrame {
 	JFrame mainFrame;
 	JButton runTestsButton;
 	JButton closeThreadButton;
@@ -40,43 +38,48 @@ public class ViewFrame {
 	HintTextField inputTextField;
 	JTextPane testOutputTextPane;
 	JTextArea testSuccessOrFailTextArea;
-	JCheckBox hideTestOutputCheckBox;
-	JCheckBox runTestsInOrder;
+	JCheckBox runTestsInSequence;
 	JScrollPane scrollableTextArea;
 	JProgressBar testProgressBar;
 	JPanel upperPanelRunning;
 	JPanel upperPanel;
 	CardLayout cards;
 	Boolean inputPanelShowing=true;
-	Boolean runTestInOrder;
+	Boolean runTestInSequence;
+	
+	private Color backgroundColor= new Color(18,18,18);
 	
 	
-	// OBSERVE: Should only be called from EDT.
-	
-	public ViewFrame(String windowName) {
+	/** Generates a TestUnit GUI
+	 * @param windowName name of the window created
+	 */
+	public TestUnitViewFrame(String windowName) {
+		
 		mainFrame = new JFrame(windowName);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setLayout(new BorderLayout());
 		
 		JPanel upperPanel = createUpperPanel();
 		JPanel middlePanel = createMiddlePanel();
-		JPanel lowerPanel = createLowerPanel();
+
 		
 		
 		mainFrame.add(upperPanel,BorderLayout.NORTH);
 		mainFrame.add(middlePanel,BorderLayout.CENTER);
-		mainFrame.add(lowerPanel,BorderLayout.SOUTH);
 		
-		mainFrame.setFont(new Font("Lucida Console",Font.BOLD,16));
-		ChangeFont.changeFont(mainFrame, "Arial");
 		
+	
 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu = createMenu();
 		menuBar.add(menu);
 		mainFrame.setJMenuBar(menuBar);
 		
-		mainFrame.setPreferredSize(new Dimension(500,500));
+		mainFrame.setFont(new Font("Lucida Console",Font.BOLD,16));
+		ChangeFont.changeFont(mainFrame, "NSimSun",
+							  ChangeFont.CHANGE_UNDERLAYING_COMPONENTS);
+		
+		mainFrame.setPreferredSize(new Dimension(600,600));
 		mainFrame.pack();
 		middlePanel.requestFocusInWindow();
 		
@@ -84,6 +87,10 @@ public class ViewFrame {
 		
 	}
 	
+	/** Creates a menu
+	 * 
+	 * @return A JMenu that is suitable to add to a JMenuBar.
+	 */
 	private JMenu createMenu() {
 		JMenu menu=new JMenu("Settings");
 		Stack<Container> containers= new Stack<>();
@@ -96,6 +103,9 @@ public class ViewFrame {
 		return menu;
 	}
 
+	/** Creates and returns the upper panel
+	 * @return a JPanel which is to be added as a upper panel of main frame.
+	 */
 	private JPanel createUpperPanel() {
 		upperPanel = new JPanel();
 		cards = new CardLayout();
@@ -105,9 +115,8 @@ public class ViewFrame {
 		
 		
 		JPanel upperPanelInput = 
-				createInputPanel((CardLayout)upperPanel.getLayout(),upperPanel);
-		upperPanelRunning = createRunningPanel(
-				(CardLayout)upperPanel.getLayout(),upperPanel);
+				createInputPanel();
+		upperPanelRunning = createRunningPanel();
 		
 		 
 		
@@ -119,6 +128,9 @@ public class ViewFrame {
 		
 	}
 	
+	/** Creates and returns the middle panel 
+	 * @return A JPanel which is to be added to the center of main frame.
+	 */
 	private JPanel createMiddlePanel() {
 		JPanel middlePanel = new JPanel();
 		middlePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); 
@@ -142,30 +154,20 @@ public class ViewFrame {
 		return middlePanel;
 	}
 	
-	private JPanel createLowerPanel() {
-		JPanel lowerPanel = new JPanel();
-		lowerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		hideTestOutputCheckBox = new JCheckBox("Hide Test Output");
-		hideTestOutputCheckBox.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				boolean enabled =
-							e.getStateChange() == ItemEvent.DESELECTED;
-				testOutputTextPane.setVisible(enabled);
-			}
-		});
-		lowerPanel.add(hideTestOutputCheckBox);
+	/** Creates the panel for input of test
+	 * panel contains text field for input of test classes,
+	 * also contains a button for running tests and finally 
+	 * a checkbox for running tests sequentially.
+	 * @return the created JPanel.
+	 */
+	private JPanel createInputPanel() {
 		
-		return lowerPanel;
-	}
-	
-	private JPanel createInputPanel(CardLayout cards, JPanel parentPanel) {
 		JPanel inputPanel = new JPanel();
 		inputPanel.setLayout(new BorderLayout());
-		
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BorderLayout());
-		inputTextField = new HintTextField();
-		inputTextField.setFont(new Font("Lucida Console",Font.PLAIN,16));		
+		inputTextField = new HintTextField(GlobalVariables.hintMessage);
+		inputTextField.setFont(new Font("Lucida Console",Font.PLAIN,16));
 		leftPanel.add(inputTextField);
 		
 		
@@ -173,11 +175,12 @@ public class ViewFrame {
 		JPanel rightPanel = new JPanel();
 		rightPanel.setLayout(new GridLayout(1,2));
 		runTestsButton = new JButton("Run Tests");
-		runTestsInOrder = new JCheckBox("Run Tests In Order");
+		runTestsInSequence = new JCheckBox("Run Tests Sequentially");
+
 		
 		
 		rightPanel.add(runTestsButton);
-		rightPanel.add(runTestsInOrder);
+		rightPanel.add(runTestsInSequence);
 		
 		
 		inputPanel.add(leftPanel,BorderLayout.CENTER);
@@ -186,7 +189,11 @@ public class ViewFrame {
 		return inputPanel;
 	}
 	
-	private JPanel createRunningPanel(CardLayout cards, JPanel parentPanel) {
+	/** Creates the panel which is to be shown while tests are running
+	 * panel contains a progressbar and a button for closing tests
+	 * @return the created JPanel.
+	 */
+	private JPanel createRunningPanel() {
 		JPanel runningPanel = new JPanel();
 		runningPanel.setLayout(new FlowLayout());
 		closeThreadButton = new JButton("Cancel Tests");
@@ -199,11 +206,19 @@ public class ViewFrame {
 	}
 	
 	
+	/** calls setVisible(true) on frame.
+	 * 
+	 */
 	public void show() {
 		mainFrame.setVisible(true);
 	}
 
-	public void addToOutputTextField(String s,AttributeSet as) {
+	
+	/** Appends string with specified attributeset to outputtextpane
+	 * @param s String to be appended
+	 * @param as Attributeset for string to be appended
+	 */
+	public void appendToOutputTextField(String s,AttributeSet as) {
 		Document doc = testOutputTextPane.getDocument();
 		try {
 			doc.insertString(doc.getLength(), s, as);
@@ -212,6 +227,11 @@ public class ViewFrame {
 		}
 	}
 	
+	/** Updates testSuccesOrFailTextArea
+	 * @param successes number of successes of test
+	 * @param fails number of failures of test (without exception)
+	 * @param exceptions number of failures with exception
+	 */
 	public void setSuccessAndFails(int successes,int fails,int exceptions) {
 		if(fails==0&&exceptions==0) {
 			testSuccessOrFailTextArea.setText("You passed all "+successes+ 
@@ -223,21 +243,32 @@ public class ViewFrame {
 		}
 	}
 	
-	public void setLitseners(Controller controller) {
+	
+	/** Sets listeners of buttons and textfields
+	 * @param testUnitController testUnitController class to be added to listeners
+	 */
+	public void setLitseners(TestUnitController testUnitController) {
 		runTestsButton.addActionListener(
-				new RunTestButtonLitsener(controller,runTestsInOrder));
+				new RunTestButtonLitsener(testUnitController,runTestsInSequence));
 		closeThreadButton.addActionListener(
-				new closeThreadButtonLitsener(controller));
+				new CloseThreadButtonListener(testUnitController));
 		inputTextField.addKeyListener(
-				new MyOwnKeyListener(controller,runTestsInOrder));
-		upperPanelRunning.addKeyListener(new MyOtherKeyListener(controller));
+				new MyOwnKeyListener(testUnitController,runTestsInSequence));
+		upperPanelRunning.addKeyListener(new MyOtherKeyListener(testUnitController));
 		
 	}
 	
+	
+	/** gets Input from input textfield
+	 * @return string from input text field
+	 */
 	public String getInput() {
 		return inputTextField.getText();
 	}
 
+	/** switches between input and running panel
+	 * 
+	 */
 	public void switchUpperPanels() {
 		inputPanelShowing=!inputPanelShowing;
 		cards.next(upperPanel);
@@ -249,15 +280,25 @@ public class ViewFrame {
 		
 	}
 	
+	/** Displays error message with a JOptionPane
+	 * @param errorMessage String to be presented
+	 */
 	public void popupError(String errorMessage) {
 		JOptionPane.showMessageDialog(mainFrame,errorMessage,"Error",
 									  JOptionPane.ERROR_MESSAGE);
 	}
 
+	/** clears the output textpane of text
+	 * 
+	 */
 	public void clearOutputTextField() {
 		testOutputTextPane.setText(null);
 	}
 
+	/** Updates progressbar of running panel
+	 * @param nmbrOfFinishedTests integer of finished tests
+	 * @param nmbrOfTestMethods integer of total tests
+	 */
 	public void updateProgressBar(Integer nmbrOfFinishedTests,
 							      Integer nmbrOfTestMethods) {
 		testProgressBar.setValue(nmbrOfFinishedTests);
@@ -265,11 +306,18 @@ public class ViewFrame {
 								  " Tests completed");
 	}
 
+	/** Clears sucessorfail textarea
+	 * 
+	 */
 	public void clearSuccesOrFailTextField() {
 		testSuccessOrFailTextArea.setText(null);
 		
 	}
 	
+	/** Sets the value of the progressbar
+	 * @param min min value of progressbar
+	 * @param max max value of progressbar
+	 */
 	public void setMinMaxProgressBar(int min, int max) {
 		testProgressBar.setMinimum(min);
 		testProgressBar.setMaximum(max);

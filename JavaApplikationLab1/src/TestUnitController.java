@@ -5,17 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
-import java.util.concurrent.Semaphore;
-
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-public class Controller {
+public class TestUnitController {
 	public boolean runInOrder;
 	private TestChecker testChecker;
-	private ViewFrame viewFrame;
+	private TestUnitViewFrame testUnitViewFrame;
 	private Collection<Method> testMethods;
 	private Integer nmbrOfTestMethods;
 	private Integer nmbrOfFinishedTests;
@@ -26,8 +24,8 @@ public class Controller {
 	private ArrayList<String> publishedMethodNames=new ArrayList<>();
 	
 	
-	public Controller(ViewFrame viewFrame) {
-		this.viewFrame=viewFrame;
+	public TestUnitController(TestUnitViewFrame testUnitViewFrame) {
+		this.testUnitViewFrame=testUnitViewFrame;
 	}
 	
 	public void CloseThreads() {
@@ -40,9 +38,9 @@ public class Controller {
 		if(this.InitTestChecker(className)) {
 			testMethods=testChecker.getTestMethods();
 			nmbrOfTestMethods=testMethods.size();
-			viewFrame.setMinMaxProgressBar(0, nmbrOfTestMethods);
+			testUnitViewFrame.setMinMaxProgressBar(0, nmbrOfTestMethods);
 			nmbrOfFinishedTests=0;
-			viewFrame.updateProgressBar(nmbrOfFinishedTests, nmbrOfTestMethods);
+			testUnitViewFrame.updateProgressBar(nmbrOfFinishedTests, nmbrOfTestMethods);
 			workers = new ArrayList<TestCheckSwingWorker>(nmbrOfTestMethods);
 			Stack<Method> testMethodSingles;
 			int i=0;
@@ -73,10 +71,10 @@ public class Controller {
 			try {
 				testChecker = new TestChecker(className,this);
 			} catch (ClassNotFoundException e) {
-				viewFrame.popupError("Class name not Found");
+				testUnitViewFrame.popupError("Class name not Found");
 				return false;
 			} catch (ClassNotTestClassException e) {
-				viewFrame.popupError("Class is not a TestClass");
+				testUnitViewFrame.popupError("Class is not a TestClass");
 				return false;
 			}
 			return true;
@@ -85,14 +83,14 @@ public class Controller {
 	public void RunTestButtonPressed(AWTEvent e,boolean runInOrder) {
 		this.clear();
 		this.runInOrder=runInOrder;
-		String className=viewFrame.getInput();
+		String className=testUnitViewFrame.getInput();
 		System.out.println(className);
 		if(className == null || className.trim().equals("")) {
-			viewFrame.popupError("You must enter a classname");
+			testUnitViewFrame.popupError("You must enter a classname");
 		}else {
 			if(this.RunTests(className)) {
 				// Should be called from EDT?
-				viewFrame.switchUpperPanels();
+				testUnitViewFrame.switchUpperPanels();
 			}
 		}
 		
@@ -102,15 +100,15 @@ public class Controller {
 	public void CloseThreadButtonPressed(AWTEvent e) {
 		this.CloseThreads();
 		this.clear();
-		viewFrame.addToOutputTextField("Tests were Cancelled",null);
+		testUnitViewFrame.appendToOutputTextField("Tests were Cancelled",null);
 		// Should be called from EDT?
-		viewFrame.switchUpperPanels();
+		testUnitViewFrame.switchUpperPanels();
 		
 	}
 	
 	public void clear() {
-		viewFrame.clearOutputTextField();
-		viewFrame.clearSuccesOrFailTextField();
+		testUnitViewFrame.clearOutputTextField();
+		testUnitViewFrame.clearSuccesOrFailTextField();
 		nmbrOfFinishedTests=0;
 		nmbrOfSuccesses=0;
 		nmbrOfFails=0;
@@ -130,27 +128,27 @@ public class Controller {
 				}else {
 					nmbrOfExceptionFails++;
 				}
-				viewFrame.addToOutputTextField(tr.getMethodName()+" :",null);
+				testUnitViewFrame.appendToOutputTextField(tr.getMethodName()+" :",null);
 				String testResultString = 
 						(tr.getResult() ? " PASSED!" : " FAILED!");
 				StyleContext sc = StyleContext.getDefaultStyleContext();
 		        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
 		        		StyleConstants.Foreground,
 		        		tr.getResult() ? Color.green : Color.red);
-				viewFrame.addToOutputTextField(testResultString,aset);
+				testUnitViewFrame.appendToOutputTextField(testResultString,aset);
 				if(tr.getException()!=null) {
-					viewFrame.addToOutputTextField(" Because of exception :"
+					testUnitViewFrame.appendToOutputTextField(" Because of exception :"
 							+tr.getException().toString()+ "\n", null);
 				}else {
-					viewFrame.addToOutputTextField("\n", null);
+					testUnitViewFrame.appendToOutputTextField("\n", null);
 				}
 				if(nmbrOfFinishedTests<nmbrOfTestMethods) {
-					viewFrame.updateProgressBar(nmbrOfFinishedTests,
+					testUnitViewFrame.updateProgressBar(nmbrOfFinishedTests,
 												nmbrOfTestMethods);	
 				}else {
-					viewFrame.setSuccessAndFails(nmbrOfSuccesses,
+					testUnitViewFrame.setSuccessAndFails(nmbrOfSuccesses,
 							nmbrOfFails,nmbrOfExceptionFails);
-					viewFrame.switchUpperPanels();
+					testUnitViewFrame.switchUpperPanels();
 					
 				}
 			}

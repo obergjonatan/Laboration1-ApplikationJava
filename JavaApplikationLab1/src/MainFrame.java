@@ -11,10 +11,10 @@ public class MainFrame {
 			
 			@Override
 			public void run() {
-				 ViewFrame gui = new ViewFrame("Namn");
+				 TestUnitViewFrame gui = new TestUnitViewFrame("UnitTester");
 				 gui.show();
-				 Controller controller = new Controller(gui);
-				 gui.setLitseners(controller);
+				 TestUnitController testUnitController = new TestUnitController(gui);
+				 gui.setLitseners(testUnitController);
 			}
 		});
 

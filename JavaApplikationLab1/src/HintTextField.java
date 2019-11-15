@@ -5,30 +5,31 @@ import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 
 
+/** JTextField that allows the text field to show a hint
+ *  Allows text field to present a hint when no input to textfield
+ *  has been given. Hint disappears when user inputs anything 
+ *  to the textfield. If text field loses focus and has no text 
+ *  in it hint is shown again. 
+ * @author Jonatan
+ *
+ */
 public class HintTextField extends JTextField implements FocusListener {
+	
 	private String hint;
 	private boolean showingHint;
-	public HintTextField() {
+	public HintTextField(String hint) {
 		super(GlobalVariables.hintMessage);
 		this.setForeground(Color.LIGHT_GRAY);
-		this.hint=GlobalVariables.hintMessage;
+		this.hint=hint;
 		super.addFocusListener(this);
 		this.showingHint=true;
 		((AbstractDocument) this.getDocument()).setDocumentFilter(
 				new MyDocFilter(this));
 	}
-	@Override
-	public void focusGained(FocusEvent e) {
-		/*
-	}
-		if(this.getText().isEmpty()) {
-			this.setForeground(null);
-			this.setText("");
-			showingHint=false;
-			
-		}
-	*/	
-	}
+
+	/** Updates textfield to show hint if textfield is empty
+	 *
+	 */
 	@Override
 	public void focusLost(FocusEvent e) {
 		if(this.getText().isEmpty()) {
@@ -38,6 +39,9 @@ public class HintTextField extends JTextField implements FocusListener {
 		}
 		
 	}
+	/** Returns text in textfield, returns empty string if hint is showing
+	 * @return String of textfield, string is empty if hint is showing
+	 */
 	@Override
 	public String getText(){
 		if(showingHint) {
@@ -47,8 +51,19 @@ public class HintTextField extends JTextField implements FocusListener {
 		}
 	}
 		
+	/** sets boolean showinghint
+	 * @param b what showinghint should be set to. 
+	 */
 	public void setShowingHint(boolean b) {
 		this.showingHint=b;
+	}
+
+	/** Does nothing. 
+	 *
+	 */
+	@Override
+	public void focusGained(FocusEvent e) {
+		
 	}
 		
 		

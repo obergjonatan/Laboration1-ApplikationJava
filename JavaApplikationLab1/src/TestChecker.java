@@ -8,7 +8,7 @@ public class TestChecker {
 	private Method tearDown;
 	private Stack<Method> testMethods = new Stack<Method>();
 	
-	public TestChecker(String className,Controller controller) 
+	public TestChecker(String className,TestUnitController testUnitController) 
 			throws ClassNotFoundException, ClassNotTestClassException {
 		testClass = Class.forName(className);
 		if(!TestClass.class.isAssignableFrom(testClass)) {

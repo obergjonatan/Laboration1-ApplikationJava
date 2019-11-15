@@ -4,11 +4,11 @@ import java.awt.event.KeyListener;
 import javax.swing.JCheckBox;
 
 public class MyOwnKeyListener implements KeyListener {
-	Controller controller;
+	TestUnitController testUnitController;
 	JCheckBox runTestsInOrder;
 	
-	public MyOwnKeyListener(Controller controller,JCheckBox runTestsInOrder) {
-		this.controller=controller;
+	public MyOwnKeyListener(TestUnitController testUnitController,JCheckBox runTestsInOrder) {
+		this.testUnitController=testUnitController;
 		this.runTestsInOrder=runTestsInOrder;
 	}
 	@Override
@@ -20,7 +20,7 @@ public class MyOwnKeyListener implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode()==KeyEvent.VK_ENTER) {
-			controller.RunTestButtonPressed(e,runTestsInOrder.isSelected());
+			testUnitController.RunTestButtonPressed(e,runTestsInOrder.isSelected());
 		}
 
 	}
