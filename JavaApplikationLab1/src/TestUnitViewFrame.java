@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -13,6 +12,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -40,6 +40,7 @@ public class TestUnitViewFrame {
 	JTextArea testSuccessOrFailTextArea;
 	JCheckBox runTestsInSequence;
 	JScrollPane scrollableTextArea;
+	JMenuItem classPathMenuItem;
 	JProgressBar testProgressBar;
 	JPanel upperPanelRunning;
 	JPanel upperPanel;
@@ -47,7 +48,6 @@ public class TestUnitViewFrame {
 	Boolean inputPanelShowing=true;
 	Boolean runTestInSequence;
 	
-	private Color backgroundColor= new Color(18,18,18);
 	
 	
 	/** Generates a TestUnit GUI
@@ -76,8 +76,8 @@ public class TestUnitViewFrame {
 		mainFrame.setJMenuBar(menuBar);
 		
 		mainFrame.setFont(new Font("Lucida Console",Font.BOLD,16));
-		ChangeFont.changeFont(mainFrame, "NSimSun",
-							  ChangeFont.CHANGE_UNDERLAYING_COMPONENTS);
+		FontChanger.changeFont(mainFrame, "NSimSun",
+							  FontChanger.CHANGE_UNDERLAYING_COMPONENTS);
 		
 		mainFrame.setPreferredSize(new Dimension(600,600));
 		mainFrame.pack();
@@ -93,14 +93,21 @@ public class TestUnitViewFrame {
 	 */
 	private JMenu createMenu() {
 		JMenu menu=new JMenu("Settings");
-		Stack<Container> containers= new Stack<>();
-		containers.add(testOutputTextPane);
-		containers.add(inputTextField);
-		containers.add(testSuccessOrFailTextArea);
-		JMenu fontsMenu=new FontMenu("Change Fonts",containers);
+		Stack<Component> components= new Stack<>();
+		components.add(testOutputTextPane);
+		components.add(testSuccessOrFailTextArea);
+		JMenu fontsMenu=new FontMenu("Change Fonts",components);
+		@SuppressWarnings("unused")
 		MenuScroller menuScroller=MenuScroller.setScrollerFor(fontsMenu);
+		JMenuItem classPathMenu = createClassPathMenu();
 		menu.add(fontsMenu);
+		menu.add(classPathMenu);
 		return menu;
+	}
+
+	private JMenuItem createClassPathMenu() {
+		classPathMenuItem = new JMenuItem("Set class path");
+		return classPathMenuItem;
 	}
 
 	/** Creates and returns the upper panel
@@ -135,11 +142,12 @@ public class TestUnitViewFrame {
 		JPanel middlePanel = new JPanel();
 		middlePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); 
 
-		middlePanel.setLayout(new BorderLayout());
+		middlePanel.setLayout(new BorderLayout(0,0));
 		testOutputTextPane = new JTextPane();
 		testOutputTextPane.setBorder(
 				BorderFactory.createTitledBorder("Test Output"));
 		testOutputTextPane.setEditable(false);
+		testOutputTextPane.setFocusable(false);
 		scrollableTextArea = new JScrollPane(testOutputTextPane,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -166,7 +174,7 @@ public class TestUnitViewFrame {
 		inputPanel.setLayout(new BorderLayout());
 		JPanel leftPanel = new JPanel();
 		leftPanel.setLayout(new BorderLayout());
-		inputTextField = new HintTextField(GlobalVariables.hintMessage);
+		inputTextField = new HintTextField("Insert test class name here");
 		inputTextField.setFont(new Font("Lucida Console",Font.PLAIN,16));
 		leftPanel.add(inputTextField);
 		
@@ -211,6 +219,7 @@ public class TestUnitViewFrame {
 	 */
 	public void show() {
 		mainFrame.setVisible(true);
+		
 	}
 
 	
@@ -218,7 +227,7 @@ public class TestUnitViewFrame {
 	 * @param s String to be appended
 	 * @param as Attributeset for string to be appended
 	 */
-	public void appendToOutputTextField(String s,AttributeSet as) {
+	public void appendToTestOutput(String s,AttributeSet as) {
 		Document doc = testOutputTextPane.getDocument();
 		try {
 			doc.insertString(doc.getLength(), s, as);
@@ -232,7 +241,7 @@ public class TestUnitViewFrame {
 	 * @param fails number of failures of test (without exception)
 	 * @param exceptions number of failures with exception
 	 */
-	public void setSuccessAndFails(int successes,int fails,int exceptions) {
+	public void updateTestSummary(int successes,int fails,int exceptions) {
 		if(fails==0&&exceptions==0) {
 			testSuccessOrFailTextArea.setText("You passed all "+successes+ 
 					" tests! Congratulations!");
@@ -247,14 +256,20 @@ public class TestUnitViewFrame {
 	/** Sets listeners of buttons and textfields
 	 * @param testUnitController testUnitController class to be added to listeners
 	 */
-	public void setLitseners(TestUnitController testUnitController) {
+	public void setListeners(TestUnitController testUnitController) {
 		runTestsButton.addActionListener(
-				new RunTestButtonLitsener(testUnitController,runTestsInSequence));
+				new RunTestButtonLitsener(testUnitController,
+										  runTestsInSequence));
 		closeThreadButton.addActionListener(
 				new CloseThreadButtonListener(testUnitController));
 		inputTextField.addKeyListener(
-				new MyOwnKeyListener(testUnitController,runTestsInSequence));
-		upperPanelRunning.addKeyListener(new MyOtherKeyListener(testUnitController));
+				new EnterToRunKeyListener(testUnitController,runTestsInSequence));
+		upperPanelRunning.addKeyListener(
+				new EscapeToCancelKeyListener(testUnitController));
+		classPathMenuItem.addActionListener(new ClassPathMenuActionListener(
+				mainFrame,testUnitController));
+		
+		
 		
 	}
 	
@@ -283,7 +298,7 @@ public class TestUnitViewFrame {
 	/** Displays error message with a JOptionPane
 	 * @param errorMessage String to be presented
 	 */
-	public void popupError(String errorMessage) {
+	public void displayPopupError(String errorMessage) {
 		JOptionPane.showMessageDialog(mainFrame,errorMessage,"Error",
 									  JOptionPane.ERROR_MESSAGE);
 	}
@@ -291,7 +306,7 @@ public class TestUnitViewFrame {
 	/** clears the output textpane of text
 	 * 
 	 */
-	public void clearOutputTextField() {
+	public void clearTestOutput() {
 		testOutputTextPane.setText(null);
 	}
 
@@ -299,8 +314,8 @@ public class TestUnitViewFrame {
 	 * @param nmbrOfFinishedTests integer of finished tests
 	 * @param nmbrOfTestMethods integer of total tests
 	 */
-	public void updateProgressBar(Integer nmbrOfFinishedTests,
-							      Integer nmbrOfTestMethods) {
+	public void updateProgressBar(int nmbrOfFinishedTests,
+							      int nmbrOfTestMethods) {
 		testProgressBar.setValue(nmbrOfFinishedTests);
 		testProgressBar.setString(""+nmbrOfFinishedTests+"/"+nmbrOfTestMethods+
 								  " Tests completed");
@@ -309,7 +324,7 @@ public class TestUnitViewFrame {
 	/** Clears sucessorfail textarea
 	 * 
 	 */
-	public void clearSuccesOrFailTextField() {
+	public void clearTestSummary() {
 		testSuccessOrFailTextArea.setText(null);
 		
 	}

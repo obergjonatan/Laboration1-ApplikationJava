@@ -1,10 +1,17 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class MyOtherKeyListener implements KeyListener {
+/** KeyListener so UnitTester can cancel tests with escape button
+ * @author Jonatan
+ *
+ */
+public class EscapeToCancelKeyListener implements KeyListener {
 	TestUnitController testUnitController;
 	
-	public MyOtherKeyListener(TestUnitController testUnitController) {
+	/** Constructor 
+	 * @param testUnitController Sets TestUnitController
+	 */
+	public EscapeToCancelKeyListener(TestUnitController testUnitController) {
 		this.testUnitController=testUnitController;
 	}
 	
@@ -13,6 +20,9 @@ public class MyOtherKeyListener implements KeyListener {
 		
 	}
 
+	/** Calls controller to cancel tests.
+	 *
+	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {

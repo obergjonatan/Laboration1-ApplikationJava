@@ -11,7 +11,7 @@ import javax.swing.border.TitledBorder;
  * @author Jonatan
  *
  */
-public class ChangeFont {
+public class FontChanger {
 	public static final int CHANGE_UNDERLAYING_COMPONENTS=1;
 	public static final int ONLY_CHANGE_THIS_COMPONENT=0;
 

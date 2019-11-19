@@ -525,7 +525,11 @@ public class MenuScroller {
   private class MenuScrollItem extends JMenuItem
           implements ChangeListener {
 
-    private MenuScrollTimer timer;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4909654258206746245L;
+	private MenuScrollTimer timer;
 
     public MenuScrollItem(MenuIcon icon, int increment) {
       setIcon(icon);

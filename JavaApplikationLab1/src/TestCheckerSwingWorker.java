@@ -3,37 +3,48 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-
 import javax.swing.SwingWorker;
 
-public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>,
+/** SwingWorker that executes test methods of test class
+ * @author Jonatan
+ *
+ */
+public class TestCheckerSwingWorker extends SwingWorker<Collection<TestResult>,
 													  TestResult> {
 
-	Iterable<Method> testMethod;
-	Class<?> testClass;
+	private Iterable<Method> testMethod;
+	private Class<?> testClass;
 	Method setUp;
 	Method tearDown;
 	TestUnitController testUnitController;
 	Boolean runInOrder;
-	public TestCheckSwingWorker(Iterable<Method> methods,Class<?> c,
+	/**
+	 * @param methods methods to be executed
+	 * @param testClass class from which to execute methods
+	 * @param setUp method to be called before each test
+	 * @param tearDown method to be called after each test
+	 * @param testUnitController controller to report TestResults back to
+	 */
+	public TestCheckerSwingWorker(Iterable<Method> methods,Class<?> testClass,
 			Method setUp,Method tearDown,TestUnitController testUnitController) {
 		this.testMethod=methods;
-		this.testClass=c;
+		this.testClass=testClass;
 		this.setUp=setUp;
 		this.tearDown=tearDown;
 		this.testUnitController=testUnitController;
 		
 		
 	}
+	/** Executes test methods and creates TestResult for each test
+	 * publishes TestResult after they've been generated.
+	 */
 	@Override
 	protected Collection<TestResult> doInBackground() 
 			throws InstantiationException, IllegalAccessException,
 			IllegalArgumentException, InvocationTargetException,
 			NoSuchMethodException, SecurityException {
 		Object obj = testClass.getDeclaredConstructor().newInstance();
-		Stack<TestResult> testResults = new Stack();
+		Stack<TestResult> testResults = new Stack<>();
 		for(Method m:testMethod) {
 			
 			TestResult testResult= new TestResult();
@@ -63,21 +74,16 @@ public class TestCheckSwingWorker extends SwingWorker<Collection<TestResult>,
 		}
 		return testResults;
 	}
+	
 	@Override
+	
 	protected void done() {
-		try {
-			testUnitController.updateOutput(get());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		} catch (CancellationException e) {
-			
-		}
+
 	}
 	
+	/** sends List of TestResults to controller
+	 *
+	 */
 	@Override protected void process(List<TestResult> testResults) {
 		if(!this.isCancelled()) {
 			testUnitController.updateOutput(testResults);

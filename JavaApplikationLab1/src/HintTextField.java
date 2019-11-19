@@ -13,18 +13,20 @@ import javax.swing.text.AbstractDocument;
  * @author Jonatan
  *
  */
+@SuppressWarnings("serial")
 public class HintTextField extends JTextField implements FocusListener {
 	
+
 	private String hint;
 	private boolean showingHint;
 	public HintTextField(String hint) {
-		super(GlobalVariables.hintMessage);
+		super(hint);
 		this.setForeground(Color.LIGHT_GRAY);
 		this.hint=hint;
 		super.addFocusListener(this);
 		this.showingHint=true;
 		((AbstractDocument) this.getDocument()).setDocumentFilter(
-				new MyDocFilter(this));
+				new HintTextFieldDocFilter(this));
 	}
 
 	/** Updates textfield to show hint if textfield is empty
@@ -38,6 +40,10 @@ public class HintTextField extends JTextField implements FocusListener {
 			showingHint=true;
 		}
 		
+	}
+	
+	public String getHint() {
+		return hint;
 	}
 	/** Returns text in textfield, returns empty string if hint is showing
 	 * @return String of textfield, string is empty if hint is showing
