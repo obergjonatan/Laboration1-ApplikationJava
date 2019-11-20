@@ -63,6 +63,14 @@ class TestCheckerUniTests {
 		assertTrue(test1Methods.size()==testCheckerTestMethods.size(),
 				"Size should be equal");
 		
+		Method voidMethod =test1.getClass().getMethod("testVoidMethod");
+		assertFalse(testCheckerTestMethods.contains(voidMethod),
+				"Should not contain void method");
+		Method parameterMethod = test1.getClass().getMethod(
+				"testParameterMethod",String.class);
+		assertFalse(testCheckerTestMethods.contains(parameterMethod),
+				"Should not contain method with parameters");
+		
 	
 		
 	}

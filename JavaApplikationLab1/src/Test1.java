@@ -64,6 +64,14 @@ public class Test1 implements TestClass {
 		return false;
 		
 	}
+	
+	public void testVoidMethod() {
+		
+	}
+	
+	public boolean testParameterMethod(String s) {
+		return true;
+	}
 
 
 }
